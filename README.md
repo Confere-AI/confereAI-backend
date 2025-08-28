@@ -50,5 +50,3 @@ O sistema busca substituir métodos tradicionais de chamada por uma solução au
 O **ConfereAI** é um projeto experimental desenvolvido inicialmente em contexto acadêmico, com foco em validação técnica e prototipagem rápida. A evolução do sistema considera aspectos de privacidade, segurança de dados e aplicação prática em ambientes reais.
 
 ---
-
-👉 Quer que eu adicione também **badges de build, licença e versão** para já ficar pronto para o GitHub?
