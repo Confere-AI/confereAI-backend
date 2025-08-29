@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-# Awesome Project Build with TypeORM
-
-Steps to run this project:
-
-1. Run `npm i` command
-2. Setup database settings inside `data-source.ts` file
-3. Run `npm start` command
-=======
 # ConfereAI
 
 O **ConfereAI** é um sistema de monitoramento e validação de presença baseado em **Reconhecimento Facial** e **Inteligência Artificial**, projetado para ambientes acadêmicos e corporativos.
