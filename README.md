@@ -16,14 +16,13 @@ O sistema busca substituir métodos tradicionais de chamada por uma solução au
 ---
 
 ## Tecnologias
-
-**Backend:** Node.Js e ExpressJs
-**Frontend:** React
-**Banco de Dados:** PostgreSQL
-**Visão Computacional e IA:** FaceIO, MediaPipe + face-api.js
-**Infraestrutura:** Docker, APIs REST
-**CI/CD:** GitHub Actions
-**Autenticação:** (em avaliação)
+- **Backend:** Node.Js e ExpressJs
+- **Frontend:** React
+- **Banco de Dados:** PostgreSQL
+- **Visão Computacional e IA:** FaceIO, MediaPipe + face-api.js
+- **Infraestrutura:** Docker, APIs REST
+- **CI/CD:** GitHub Actions
+- **Autenticação:** (em avaliação)
 ---
 
 ## Roadmap
