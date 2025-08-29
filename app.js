@@ -2,38 +2,40 @@
 // Configurações, inicialização do App e Imports
 // =======================
 require("dotenv-safe").config();
-require('dotenv').config();
-const createError = require('http-errors');
-const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
-const passport = require('passport');
-const middlewareError = require('./src/middlewares/error.middleware');
-const authMiddleware = require('./src/middlewares/auth.middleware').authMiddleware;
-require('../src/config/passport');
+require("dotenv").config();
+const AppDataSource = require("./src/data-source");
+const createError = require("http-errors");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+const passport = require("passport");
+const middlewareError = require("./src/middlewares/error.middleware");
+const authMiddleware =
+  require("./src/middlewares/auth.middleware").authMiddleware;
+require("../src/config/passport");
 const app = express();
 // ================
 // Middlewares Globais
 // ================
-app.use(logger('dev'));
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 // ================
 // Rotas
 // ================
-const usersRouter = require('./src/routes/user.routes');
-const authRouters = require('./src/routes/auth.routes');
-const groupRouters = require('./src/routes/groups.routes');
-app.use('/api/auth', authRouters); // cadastro, login, logout, refresh
-app.use('/api/users', authMiddleware, usersRouter);
+const usersRouter = require("./src/routes/user.routes");
+const authRouters = require("./src/routes/auth.routes");
+const groupRouters = require("./src/routes/groups.routes");
+app.use("/api/auth", authRouters); // cadastro, login, logout, refresh
+app.use("/api/users", authMiddleware, usersRouter);
 // =======================
 // Tratamento de Erros 404
 // =======================
-app.use(function (req, res, next) { 
+app.use(function (req, res, next) {
   next(createError(404));
 });
 // =======================
@@ -54,6 +56,11 @@ process.on("unhandledRejection", (err) => {
 // =======================
 // Inicialização do Servidor
 // =======================
+AppDataSource.initialize() // isso aqui faz a conexão com o banco de dados
+  .then(async () => {
+    console.log("Conectado ao Banco de dados");
+  })
+  .catch((error) => console.log(error));
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
