@@ -1,8 +1,6 @@
 const { Strategy, ExtractJwt } = require('passport-jwt');
 const passport = require('passport');
-const { connectToDB, execSql } = require('../config/db');
 const userService = require('../services/user.service');
-const { Request, TYPES } = require('tedious');
 const jwtOptions = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // essa linha
     secretOrKey: process.env.JWT_SECRET

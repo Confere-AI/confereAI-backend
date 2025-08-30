@@ -1,19 +1,18 @@
 // =======================
 // Configurações, inicialização do App e Imports
 // =======================
-require("dotenv-safe").config();
+require('dotenv-safe').config();
 require("dotenv").config();
-const AppDataSource = require("./src/data-source");
 const createError = require("http-errors");
 const express = require("express");
+const objectDB = require('./src/config/db');
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 const passport = require("passport");
 const middlewareError = require("./src/middlewares/error.middleware");
-const authMiddleware =
-  require("./src/middlewares/auth.middleware").authMiddleware;
-require("../src/config/passport");
+const authMiddleware = require("./src/middlewares/auth.middleware").authMiddleware;
+require("./src/config/passport");
 const app = express();
 // ================
 // Middlewares Globais
@@ -29,7 +28,6 @@ app.use(express.static(path.join(__dirname, "public")));
 // ================
 const usersRouter = require("./src/routes/user.routes");
 const authRouters = require("./src/routes/auth.routes");
-const groupRouters = require("./src/routes/groups.routes");
 app.use("/api/auth", authRouters); // cadastro, login, logout, refresh
 app.use("/api/users", authMiddleware, usersRouter);
 // =======================
@@ -54,13 +52,9 @@ process.on("unhandledRejection", (err) => {
   process.exit(1);
 });
 // =======================
-// Inicialização do Servidor
+// Inicialização do Servidor e do Banco de Dados
 // =======================
-AppDataSource.initialize() // isso aqui faz a conexão com o banco de dados
-  .then(async () => {
-    console.log("Conectado ao Banco de dados");
-  })
-  .catch((error) => console.log(error));
+
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);

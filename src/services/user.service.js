@@ -1,4 +1,3 @@
-const { connectToDB, execSql } = require('../config/db');
 const { TYPES } = require('tedious');
 
 async function getUsers() {
