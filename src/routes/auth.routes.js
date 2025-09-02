@@ -1,25 +1,24 @@
-const express = require("express");
+import express from "express";
+import {
+  signUpvalidateMiddleware
+//  signInvalidateMiddleware,
+} from "../middlewares/validate.middleware.js";
+//import authMiddleware from "../middlewares/auth.middleware.js";
+import { signUpNormal } from "../controllers/auth.controller.js";
 const router = express.Router();
-const validateMiddleware = require("../middlewares/validate.middleware");
-const authMiddleware = require("../middlewares/auth.middleware");
-const authController = require("../controllers/auth.controller");
 
-router.post(
-  "/sign-up",
-  validateMiddleware.signUpvalidateMiddleware,
-  authController.createUser
-);
-router.post(
-  "/sign-in",
-  validateMiddleware.signInvalidateMiddleware,
-  authController.signIn
-);
-router.post(
-  "/logout",
-  authMiddleware.authMiddleware, // para fazer o logout precisa estar autenticado
-  authController.logoutUser
-);
+router.post("/sign-up", /*signUpvalidateMiddleware,*/ signUpNormal);
+//router.post(
+//  "/sign-in",
+//  validateMiddleware.signInvalidateMiddleware,
+//  authController.signIn
+//);
+//router.post(
+//  "/logout",
+//  authMiddleware.authMiddleware, // para fazer o logout precisa estar autenticado
+//  authController.logoutUser
+//);
+//
+//router.post("/refresh", authController.refreshToken);
 
-router.post("/refresh", authController.refreshToken);
-
-module.exports = router;
+export default router;

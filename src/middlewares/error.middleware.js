@@ -1,5 +1,5 @@
 
-function errorMiddleware(err, req, res, next) {
+export default function errorMiddleware(err, req, res, next) {
     console.error(err.stack);
     const env = req.app.get('env');
     const status = err.status || 500;
@@ -32,4 +32,3 @@ function errorMiddleware(err, req, res, next) {
     }
     next();
 }
-module.exports = errorMiddleware;
