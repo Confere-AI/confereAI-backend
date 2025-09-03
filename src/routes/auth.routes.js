@@ -7,7 +7,7 @@ import {
 import { signUpNormal } from "../controllers/auth.controller.js";
 const router = express.Router();
 
-router.post("/sign-up", /*signUpvalidateMiddleware,*/ signUpNormal);
+router.post("/sign-up", signUpvalidateMiddleware, signUpNormal);
 //router.post(
 //  "/sign-in",
 //  validateMiddleware.signInvalidateMiddleware,

@@ -1,4 +1,4 @@
-//import { userService } from "../services/user.service.js";
+import { getUsers } from "../services/user.service.js";
 
 export default async function signUpvalidateMiddleware(req, res, next) {
   if (!req.body) {
@@ -10,7 +10,7 @@ export default async function signUpvalidateMiddleware(req, res, next) {
       .status(400)
       .json({ message: "Usuario e senha são obrigatórios" });
   }
-  const users = await userService.getUsers();
+  const users = await getUsers();
   if (users.some((user) => user.name === name)) {
     return res.status(409).json({ message: "Usuário já existe" });
   }
