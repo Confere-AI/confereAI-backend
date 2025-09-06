@@ -12,6 +12,7 @@ import "reflect-metadata";
 import middlewareError from "./src/middlewares/error.middleware.js";
 const app = express();
 import authRouters from "./src/routes/auth.routes.js";
+import userRouters from "./src/routes/user.routes.js";
 // ================
 // Middlewares Globais
 // ================
@@ -24,7 +25,7 @@ app.use(cookieParser());
 // Rotas
 // ================
 app.use("/api/auth", authRouters); // cadastro, login, logout, refresh
-//app.use("/api/usuarios", usuarioRouters); // rotas para usuários, ver perfil etc
+app.use("/api/usuarios", usuarioRouters); // rotas para usuários, ver perfil etc
 // =======================
 // Tratamento de Erros 404
 // =======================

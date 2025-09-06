@@ -6,7 +6,6 @@ import {
 //import authMiddleware from "../middlewares/auth.middleware.js";
 import { signUpNormal } from "../controllers/auth.controller.js";
 const router = express.Router();
-
 router.post("/sign-up", signUpvalidateMiddleware, signUpNormal);
 //router.post(
 //  "/sign-in",
