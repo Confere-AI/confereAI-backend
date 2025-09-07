@@ -36,4 +36,20 @@ async function selectMe(userId) {
   }
 }
 
-export { selectUsers, selectMe };
+async function selectLogin(params) {
+  try {
+    if (params.email) {
+      const result = await db.one("SELECT * FROM usuario WHERE email = $1", [params.email]);
+      return result
+    }
+    if (params.name) {
+      const result = await db.one("SELECT * FROM usuario WHERE name = $1", [params.name]);
+      return result
+    }
+    throw new Error("Parâmetro invalido para login.");
+  } catch (error) {
+    console.error("Erro ao buscar usuario para login ", error);
+  }
+}
+
+export { selectUsers, selectMe, selectLogin };

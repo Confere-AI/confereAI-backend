@@ -1,4 +1,4 @@
-import { userService } from '../services/user.service';
+import { myProfileService } from '../services/user.service.js';
 
 async function myProfile(req, res) {
     try {
@@ -6,7 +6,7 @@ async function myProfile(req, res) {
         if (!userId) { // se não for passado um userId
             return res.status(401).json({ error: "Login expirado, entre novamente!" }); // erro 401
         }
-        const me = await userService.myProfile(userId); // caso contrario, me será o usuario
+        const me = await myProfileService(userId); // caso contrario, me será o usuario
         if (!me) {
             return res.status(404).json({ error: "Usuário não encontrado" });
         }

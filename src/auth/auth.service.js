@@ -1,5 +1,8 @@
 //const { logoutServices } = require("../auth/logout.service");
-import { insertSignUp } from '../queries/inserts.js';
+import { insertSignUp, insertRefresh } from "../queries/inserts.js";
+import { selectLogin } from "../queries/selects.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 async function signUpNormalService(params) {
   try {
@@ -10,57 +13,68 @@ async function signUpNormalService(params) {
   }
 }
 
-//async function signInUserWithJwt(params) {
-//  let connection = null;
-//  try {
-//    connection = await connectToDB();
-//    let user = null;
-//    if (params.email) {
-//      const sql = await execSql(
-//        connection,
-//        "SELECT * FROM users WHERE email = @email",
-//        {
-//          "@email": { type: TYPES.NVarChar, value: params.email },
-//        }
-//      );
-//      user = sql[0] || null;
-//    } else if (params.name) {
-//      const sql = await execSql(
-//        connection,
-//        "SELECT * FROM users WHERE name = @name",
-//        {
-//          "@name": { type: TYPES.NVarChar, value: params.name },
-//        }
-//      );
-//      user = sql[0] || null;
-//    }
-//    return user;
-//  } catch (err) {
-//    console.error("Erro:", err);
-//    return null;
-//  } finally {
-//    if (connection) {
-//      connection.close();
-//    }
-//  }
-//}
-//
-//async function saveRefreshToken(usuario_id, token, expiracao) {
-//  try {
-//    const connection = await connectToDB();
-//    await execSql(
-//      connection,
-//      "INSERT INTO RefreshTokens (usuario_id, token, expiracao) VALUES (@usuario_id, @token, @expiracao)",
-//      {
-//        "@usuario_id": { type: TYPES.Int, value: usuario_id },
-//        "@token": { type: TYPES.NVarChar, value: token },
-//        "@expiracao": { type: TYPES.DateTime, value: expiracao },
-//      }
-//    );
-//    connection.close();
-//  } catch (err) {
-//    console.error("Erro:", err);
-//  }
-//}
+async function signInNormalService(params) {
+  // params é um objeto que contem name e email
+  try {
+    let user = null;
+    const identifier = params.email || params.name;
+    if (!identifier) {
+      throw new Error("Email ou nome é obrigatório.");
+    }
+    const query = await selectLogin(identifier);
+    user = query[0] || null; // aqui, procura o usuario.
+    if (!user) {
+      throw new Error("Usuario não encontrado.");
+    }
+    if (user && user.password) {
+      //user.password é a senha hash do banco de dados
+      const isMatch = await bcrypt.compare(params.password, user.password);
+      if (isMatch) {
+        const tokenJwt = jwt.sign(
+          { id: user.id, name: user.name, email: user.email },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: parseInt(process.env.JWT_EXPIRES),
+          }
+        );
+        const refreshTokenJwt = jwt.sign(
+          { id: user.id, name: user.name, email: user.email },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: parseInt(process.env.JWT_REFRESH_EXPIRES),
+          }
+        );
+        const expiracao = new Date(
+          Date.now() + parseInt(process.env.JWT_REFRESH_EXPIRES) * 1000
+        );
+        await saveRefreshToken(user.id, refreshTokenJwt, expiracao);
+        return {
+          userData: user,
+          token: tokenJwt,
+          refreshToken: refreshTokenJwt,
+          expires: expiracao,
+        };
+      }
+    }
+  } catch (err) {
+    console.error("Erro:", err);
+    throw err;
+  }
+}
 
-export { signUpNormalService };
+async function saveRefreshToken(userId, refreshToken, expiresAt) {
+  try {
+    const params = {
+      userId,
+      refreshToken,
+      expiresAt,
+    };
+    const query = insertRefresh(params);
+    console.log('refresh token add');
+    return query
+  } catch (err) {
+    console.error("Erro:", err);
+  }
+}
+
+export { signUpNormalService, signInNormalService };

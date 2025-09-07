@@ -10,7 +10,7 @@ async function getUsers() {
   }
 }
 
-async function myProfile(userId) {
+async function myProfileService(userId) {
     try {
         if (!userId) {
             throw new Error('Id do usuario obrigatorio.');
@@ -27,4 +27,4 @@ async function myProfile(userId) {
     }
 }
 
-export { getUsers, myProfile };
+export { getUsers, myProfileService };

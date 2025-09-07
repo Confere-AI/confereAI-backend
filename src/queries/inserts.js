@@ -25,4 +25,16 @@ async function insertSignUp({ email, name, password }) {
     }
 }
 
-export { insertSignUp };
+async function insertRefresh({ usuario_id, token, expiracao }) {
+    try {
+        const result = db.none('INSERT INTO RefreshTokens (usuario_id, token, expiracao) VALUES ($1,$2,$3)', [usuario_id, token, expiracao]);
+        if (!result) {
+            throw new Error('Erro ao salvar refresh roken');
+        }
+        return result
+    } catch (error) {
+        console.error("Error", error);
+    }
+}
+
+export { insertSignUp, insertRefresh };
