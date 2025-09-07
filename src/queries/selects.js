@@ -29,27 +29,39 @@ async function selectUsers() {
 
 async function selectMe(userId) {
   try {
-    const result = await db.one("SELECT * FROM usuario WHERE id = $1", [userId]);
+    const result = await db.one("SELECT * FROM usuario WHERE id = $1", [
+      userId,
+    ]);
     return result;
   } catch (error) {
     console.error("Erro ao buscar usuario ", error);
   }
 }
 
-async function selectLogin(params) {
+async function selectLogin(identifier) {
   try {
-    if (params.email) {
-      const result = await db.one("SELECT * FROM usuario WHERE email = $1", [params.email]);
-      return result
+    const result = await db.one(
+      "SELECT * FROM usuario WHERE email = $1 OR name = $1 LIMIT 1",
+      [identifier]
+    );
+    if (!result) {
+      throw new Error("Parâmetro invalido para login.");
     }
-    if (params.name) {
-      const result = await db.one("SELECT * FROM usuario WHERE name = $1", [params.name]);
-      return result
-    }
-    throw new Error("Parâmetro invalido para login.");
+    return result;
   } catch (error) {
-    console.error("Erro ao buscar usuario para login ", error);
+    console.error("Erro ao buscar usuario para login", error);
   }
 }
 
-export { selectUsers, selectMe, selectLogin };
+async function selectTokenRefresh(token) {
+  try {
+    const result = await db.oneOrNone("SELECT 1 FROM refreshtokenblacklist WHERE Token = $1",
+      [token]
+    );
+    return result;
+  } catch (error) {
+    console.error('Erro ao concluir refresh token', error);
+  }
+}
+
+export { selectUsers, selectMe, selectLogin, selectTokenRefresh };

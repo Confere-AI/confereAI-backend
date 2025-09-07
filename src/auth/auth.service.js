@@ -1,4 +1,5 @@
 //const { logoutServices } = require("../auth/logout.service");
+// import { use } from "passport";
 import { insertSignUp, insertRefresh } from "../queries/inserts.js";
 import { selectLogin } from "../queries/selects.js";
 import bcrypt from "bcrypt";
@@ -21,8 +22,7 @@ async function signInNormalService(params) {
     if (!identifier) {
       throw new Error("Email ou nome é obrigatório.");
     }
-    const query = await selectLogin(identifier);
-    user = query[0] || null; // aqui, procura o usuario.
+    user = await selectLogin(identifier);
     if (!user) {
       throw new Error("Usuario não encontrado.");
     }
@@ -45,14 +45,19 @@ async function signInNormalService(params) {
           }
         );
         const expiracao = new Date(
-          Date.now() + parseInt(process.env.JWT_REFRESH_EXPIRES) * 1000
+          Date.now() + parseInt(process.env.JWT_REFRESH_EXPIRES)
         );
         await saveRefreshToken(user.id, refreshTokenJwt, expiracao);
         return {
-          userData: user,
+          Id: user.id,
+          Uuid: user.uuid,
+          Email: user.email,
+          Name: user.name,
+          ExternalId: user.external_id,
+          Metadata: user.metadata,
           token: tokenJwt,
           refreshToken: refreshTokenJwt,
-          expires: expiracao,
+          expiracao: expiracao,
         };
       }
     }
@@ -65,13 +70,13 @@ async function signInNormalService(params) {
 async function saveRefreshToken(userId, refreshToken, expiresAt) {
   try {
     const params = {
-      userId,
-      refreshToken,
-      expiresAt,
+      usuario_id: userId,
+      token: refreshToken,
+      expiracao: expiresAt,
     };
     const query = insertRefresh(params);
-    console.log('refresh token add');
-    return query
+    console.log("refresh token add");
+    return query;
   } catch (err) {
     console.error("Erro:", err);
   }

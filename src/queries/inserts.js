@@ -1,4 +1,7 @@
 import db from "../utils/config.db.js";
+import dotenv from "dotenv";
+dotenv.config();
+
 // consultas:
 //  Métodos por tipo de resultado
 //  db.any(query, values) - múltiplos resultados ou nenhum
@@ -16,25 +19,42 @@ import db from "../utils/config.db.js";
 //  db.proc(procName, values) - Para chamar stored procedures
 
 async function insertSignUp({ email, name, password }) {
-    try {
-        const result = await db.none(
-            'INSERT INTO usuario (email, name, password) VALUES ($1, $2, $3)', [email, name, password]);
-        return result;
-    } catch (error) {
-        console.error("Error inserting user:", error);
-    }
+  try {
+    const result = await db.none(
+      "INSERT INTO usuario (email, name, password) VALUES ($1, $2, $3)",
+      [email, name, password]
+    );
+    return result;
+  } catch (error) {
+    console.error("Error inserting user:", error);
+  }
 }
 
 async function insertRefresh({ usuario_id, token, expiracao }) {
-    try {
-        const result = db.none('INSERT INTO RefreshTokens (usuario_id, token, expiracao) VALUES ($1,$2,$3)', [usuario_id, token, expiracao]);
-        if (!result) {
-            throw new Error('Erro ao salvar refresh roken');
-        }
-        return result
-    } catch (error) {
-        console.error("Error", error);
+  try {
+    const result = db.none(
+      "INSERT INTO refreshtokens (usuario_id, token, expiracao) VALUES ($1,$2,$3)",
+      [usuario_id, token, expiracao]
+    );
+    if (!result) {
+      throw new Error("Erro ao salvar refresh roken");
     }
+    return result;
+  } catch (error) {
+    console.error("Error", error);
+  }
 }
 
-export { insertSignUp, insertRefresh };
+async function insertBlacklist(userId, token) {
+  try {
+    const result = db.none(
+      "INSERT INTO refreshtokenblacklist (UserId, token, ExpiresAt) VALUES ($1, $2, $3)",
+      [userId, token, process.env.JWT_REFRESH_EXPIRES]
+    );
+    return result;
+  } catch (error) {
+    console.error('erro na inserção na blacklist: ', error);
+  }
+}
+
+export { insertSignUp, insertRefresh, insertBlacklist };

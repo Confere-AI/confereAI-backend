@@ -7,6 +7,7 @@ import express from "express";
 import db from "./src/utils/config.db.js";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
+import "./src/utils/passport.js";
 import passport from "passport";
 import "reflect-metadata";
 import middlewareError from "./src/middlewares/error.middleware.js";

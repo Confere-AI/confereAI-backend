@@ -1,6 +1,10 @@
-import { signUpNormalService } from "../auth/auth.service.js";
-//import * as Logout from "../auth/logout.service.js";
+import {
+  signUpNormalService,
+  signInNormalService,
+} from "../auth/auth.service.js";
+import { isTokenBlacklisted } from "../auth/logout.service.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 async function signUpNormal(req, res) {
   // essa função é para cadastro normal, sem OAuth
@@ -37,4 +41,38 @@ async function signInNormal(req, res) {
   }
 }
 
-export { signUpNormal, signInNormal };
+async function refreshToken(req, res) {
+  try {
+    const { refreshToken } = req.body; // pega o refreshToken do cabeçalho da requisição
+    if (!refreshToken) {
+      return res.status(400).json({ error: "Refresh token é obrigatório" });
+    }
+    const isBlacklisted = await isTokenBlacklisted(refreshToken);
+    if (isBlacklisted) {
+      return res.status(401).json({ error: "Refresh token inválido" });
+    }
+    const payload = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const newAcessToken = jwt.sign(
+      { id: payload.id, name: payload.name, email: payload.email },
+      process.env.JWT_SECRET,
+      { expiresIn: parseInt(process.env.JWT_EXPIRES) }
+    );
+    res.status(200).json({ token: newAcessToken });
+  } catch (err) {
+    console.error("Erro refreshToken:", err);
+    res.status(403).json({ error: "Refresh token inválido ou expirado" });
+  }
+}
+
+async function logoutController(req, res) {
+  try {
+    const authHeader = req.get("Authorization");
+    let token = null;
+    if (authHeader && authHeader.starsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    }
+    console.log("token: ", token);
+  } catch (error) {} // parei aq
+}
+
+export { signUpNormal, signInNormal, refreshToken };
