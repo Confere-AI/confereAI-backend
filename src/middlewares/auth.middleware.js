@@ -14,7 +14,7 @@ function authMiddleware(req, res, next) {
     authHeader && authHeader.startsWith("Bearer ")
       ? authHeader.split(" ")[1]
       : null;
-  console.log("Authorization header:", token);
+//  console.log("Authorization header:", token);
   passport.authenticate("jwt", async (err, user, info) => {
     if (err) {
       console.error("Erro no passport.authenticate:", err);
@@ -31,7 +31,7 @@ function authMiddleware(req, res, next) {
       responseObj.message = "O usuario não está autorizado";
       return res.status(responseObj.statusCode).json(responseObj);
     } else {
-      console.log("Usuário autenticado:", user);
+//      console.log("Usuário autenticado:", user);
       req.user = user;
       return next();
     }

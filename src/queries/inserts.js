@@ -18,15 +18,16 @@ dotenv.config();
 //  db.func(funcName, values, qrm) - Para chamar funções do PostgreSQL
 //  db.proc(procName, values) - Para chamar stored procedures
 
-async function insertSignUp({ email, name, password }) {
+async function insertSignUp(email, name, hashedPassword) {
   try {
-    const result = await db.none(
+    await db.none(
       "INSERT INTO usuario (email, name, password) VALUES ($1, $2, $3)",
-      [email, name, password]
+      [email, name, hashedPassword]
     );
-    return result;
+    return true;
   } catch (error) {
     console.error("Error inserting user:", error);
+    throw new Error("Erro no cadastro");
   }
 }
 
@@ -45,15 +46,15 @@ async function insertRefresh({ usuario_id, token, expiracao }) {
   }
 }
 
-async function insertBlacklist(userId, token) {
+async function insertBlacklist(userId, token, expiresAt) {
   try {
     const result = db.none(
-      "INSERT INTO refreshtokenblacklist (UserId, token, ExpiresAt) VALUES ($1, $2, $3)",
-      [userId, token, process.env.JWT_REFRESH_EXPIRES]
+      "INSERT INTO refreshtokenblacklist (UserId, token, expiresat) VALUES ($1, $2, $3)",
+      [userId, token, expiresAt]
     );
     return result;
   } catch (error) {
-    console.error('erro na inserção na blacklist: ', error);
+    console.error("erro na inserção na blacklist: ", error);
   }
 }
 

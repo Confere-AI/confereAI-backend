@@ -1,4 +1,5 @@
-import { selectTokenRefresh, insertBlacklist } from "../queries/selects.js";
+import { selectTokenRefresh } from "../queries/selects.js";
+import { insertBlacklist } from "../queries/inserts.js";
 
 async function logout(userId, refreshToken) {
   try {
@@ -11,10 +12,13 @@ async function logout(userId, refreshToken) {
   }
 }
 
-async function blacklistToken(userId, token) {
+async function blacklistToken(userId, token, expiresAt) {
   try {
-    const result = await insertBlacklist(userId, token);
-    return result
+    const result = await insertBlacklist(userId, token, expiresAt);
+    if (!result) {
+      throw new Error('Erro ao fazer logout.');
+    }
+    return result;
   } catch (err) {
     console.error("Erro:", err);
   }

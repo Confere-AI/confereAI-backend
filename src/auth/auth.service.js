@@ -5,10 +5,13 @@ import { selectLogin } from "../queries/selects.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-async function signUpNormalService(params) {
+async function signUpNormalService(email, name, hashedPassword) {
   try {
-    const query = await insertSignUp(params);
-    console.log("User created:", query);
+    const query = await insertSignUp(email, name, hashedPassword);
+    if (!query) {
+      throw new Error('Cadastro não realizado.');
+    }
+    return query;
   } catch (err) {
     console.error("Erro:", err);
   }

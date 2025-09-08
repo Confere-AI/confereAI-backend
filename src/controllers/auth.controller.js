@@ -2,7 +2,7 @@ import {
   signUpNormalService,
   signInNormalService,
 } from "../auth/auth.service.js";
-import { isTokenBlacklisted } from "../auth/logout.service.js";
+import { isTokenBlacklisted, blacklistToken } from "../auth/logout.service.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -11,11 +11,7 @@ async function signUpNormal(req, res) {
   try {
     const { email, name, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
-    const result = await signUpNormalService({
-      email,
-      name,
-      password: hashedPassword,
-    });
+    const result = await signUpNormalService(email, name, hashedPassword);
     if (!result) {
       res.status(400).json({ error: "Não foi possivel se cadastrar" });
     } else {
@@ -66,13 +62,31 @@ async function refreshToken(req, res) {
 
 async function logoutController(req, res) {
   try {
-    const authHeader = req.get("Authorization");
-    let token = null;
-    if (authHeader && authHeader.starsWith("Bearer ")) {
-      token = authHeader.split(" ")[1];
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ error: "usuario não está logado" });
     }
-    console.log("token: ", token);
-  } catch (error) {} // parei aq
+    const authHeader = req.get("Authorization");
+    const accessToken =
+      authHeader && authHeader.startsWith("Bearer ")
+        ? authHeader.split(" ")[1]
+        : null;
+    const refreshToken = req.body.refreshToken;
+    const expiresAt = new Date(
+      Date.now() + parseInt(process.env.JWT_REFRESH_EXPIRES)
+    );
+    if (accessToken) {
+      await blacklistToken(userId, accessToken, expiresAt);
+    }
+
+    if (refreshToken) {
+      await blacklistToken(userId, refreshToken, expiresAt);
+    }
+    res.status(200).json({ success: "Deslogado com sucesso." });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Erro no servidor" });
+  }
 }
 
-export { signUpNormal, signInNormal, refreshToken };
+export { signUpNormal, signInNormal, refreshToken, logoutController };
