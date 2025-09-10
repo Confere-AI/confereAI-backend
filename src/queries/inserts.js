@@ -1,4 +1,4 @@
-import db from "../utils/config.db.js";
+import db from "../config/config.db.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -31,7 +31,7 @@ async function insertSignUp(email, name, hashedPassword) {
   }
 }
 
-async function insertRefresh({ usuario_id, token, expiracao }) {
+async function insertRefresh(usuario_id, token, expiracao) {
   try {
     const result = db.none(
       "INSERT INTO refreshtokens (usuario_id, token, expiracao) VALUES ($1,$2,$3)",

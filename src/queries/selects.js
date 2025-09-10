@@ -1,4 +1,4 @@
-import db from "../utils/config.db.js";
+import db from "../config/config.db.js";
 // consultas:
 //  Métodos por tipo de resultado
 //  db.any(query, values) - múltiplos resultados ou nenhum

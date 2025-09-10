@@ -1,4 +1,5 @@
 import { selectUsers, selectMe } from "../queries/selects.js";
+import { UAParser } from 'ua-parser-js';
 
 async function getUsers() {
   try {
@@ -29,4 +30,18 @@ async function myProfileService(userId) {
   }
 }
 
-export { getUsers, myProfileService };
+async function getDeviceInfo(userAgent) {
+  const parser = new UAParser(userAgent);
+  const deviceInfo = parser.getResult();
+  console.log("userAgent recebido:", userAgent);
+  if (userAgent === 'PostmanRuntime/7.46.0') {
+    return 'PostmanRuntime/7.46.0';
+  }
+  return {
+    browser: deviceInfo.browser.name,
+    os: deviceInfo.os.name,
+    device: deviceInfo.device.model,
+  };
+}
+
+export { getUsers, myProfileService, getDeviceInfo };

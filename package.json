@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "O **ConfereAI** é um sistema de monitoramento e validação de presença baseado em **Reconhecimento Facial** e **Inteligência Artificial**, projetado para ambientes acadêmicos e corporativos.\r O sistema busca substituir métodos tradicionais de chamada por uma solução automatizada, segura e escalável, além de fornecer métricas de engajamento e relatórios detalhados.",
   "main": "index.js",
+  "type": "module",
   "dependencies": {
     "abbrev": "^1.1.1",
     "accepts": "^1.3.8",
@@ -239,6 +240,7 @@
     "typed-array-buffer": "^1.0.3",
     "typeorm": "^0.3.26",
     "typescript": "^5.9.2",
+    "ua-parser-js": "^2.0.4",
     "undici-types": "^6.21.0",
     "unpipe": "^1.0.0",
     "util-deprecate": "^1.0.2",

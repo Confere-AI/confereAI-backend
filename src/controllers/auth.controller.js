@@ -1,10 +1,16 @@
 import {
   signUpNormalService,
   signInNormalService,
+  searchRefreshToken,
+  validateRefreshToken
 } from "../auth/auth.service.js";
 import { isTokenBlacklisted, blacklistToken } from "../auth/logout.service.js";
+import { getRefreshToken } from "../cache/redis.operations.js";
+import { getDeviceInfo } from "../services/user.service.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import redisClient from "../config/redis.js";
+
 
 async function signUpNormal(req, res) {
   // essa função é para cadastro normal, sem OAuth
@@ -26,9 +32,11 @@ async function signUpNormal(req, res) {
 async function signInNormal(req, res) {
   try {
     const { email, name, password } = req.body;
-    const service = await signInNormalService({ email, name, password });
+    const headerAgent = req.headers['user-agent'];
+    const userAgent = await getDeviceInfo(headerAgent);
+    const service = await signInNormalService(email, name, password, userAgent);
     if (!service) {
-      return res.status(401).json({ error: "Credenciais inválidas" });
+      res.status(401).json({ error: "Credenciais inválidas" });
     }
     return res.status(200).json(service);
   } catch (error) {
@@ -39,20 +47,19 @@ async function signInNormal(req, res) {
 
 async function refreshToken(req, res) {
   try {
-    const { refreshToken } = req.body; // pega o refreshToken do cabeçalho da requisição
-    if (!refreshToken) {
+    const { userId } = req.body; // client salva e manda o userID.
+    const headerAgent = req.headers['user-agent'];
+    let device = await getDeviceInfo(headerAgent);
+    const tokens = await searchRefreshToken(userId, device);
+    if (!tokens || tokens.length === 0) {
       return res.status(400).json({ error: "Refresh token é obrigatório" });
     }
+    const { token: refreshToken } = tokens[0];
     const isBlacklisted = await isTokenBlacklisted(refreshToken);
     if (isBlacklisted) {
       return res.status(401).json({ error: "Refresh token inválido" });
     }
-    const payload = jwt.verify(refreshToken, process.env.JWT_SECRET);
-    const newAcessToken = jwt.sign(
-      { id: payload.id, name: payload.name, email: payload.email },
-      process.env.JWT_SECRET,
-      { expiresIn: parseInt(process.env.JWT_EXPIRES) }
-    );
+    const newAcessToken = await validateRefreshToken(refreshToken);
     res.status(200).json({ token: newAcessToken });
   } catch (err) {
     console.error("Erro refreshToken:", err);

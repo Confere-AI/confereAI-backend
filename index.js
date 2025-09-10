@@ -6,6 +6,7 @@ import createError from "http-errors";
 import express from "express";
 import db from "./src/config/config.db.js";
 import redisClient from './src/config/redis.js';
+import { getDeviceInfo } from './teste.js';
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import "./src/config/passport.js";
@@ -26,8 +27,11 @@ app.use(cookieParser());
 // ================
 // Rotas
 // ================
-app.use("/api/auth", authRouters); // cadastro, login, logout, refresh
-app.use("/api/usuarios", userRouters); // rotas para usuários, ver perfil etc
+app.get('/device-info', (req, res) => {
+    const userAgent = req.headers['user-agent'];
+    const info = getDeviceInfo(userAgent);
+    res.json(info);
+});
 // =======================
 // Tratamento de Erros 404
 // =======================
@@ -52,14 +56,7 @@ process.on("unhandledRejection", (err) => {
 // =======================
 // Inicialização do Servidor e do Banco de Dados
 // =======================
-db.connect() // Conectando ao banco de dados
-  .then(() => {
-    return;
-  })
-  .catch((error) => {
-    console.error("Erro ao conectar ao banco de dados:", error);
-  });
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
-}); 
+});
